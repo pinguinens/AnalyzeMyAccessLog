@@ -1,7 +1,7 @@
 <?php
-$start = microtime(true); // Время начала выполнения скрипта
+// $start = microtime(true); // Время начала выполнения скрипта
 
-include 'metrics/memory.php';  // метрики
+// include 'metrics/memory.php';  // метрики
 include 'classes/counter.php';  // Класс счётчиков
 
 // Проверка аргументов команды
@@ -35,11 +35,11 @@ echo $statsJson;
 echo "\n";
 
 // Техническая информация по работе скрипта
-echo 'Файл: '. $argv[1];
-echo "\n";
+// echo 'Файл: '. $argv[1];
+// echo "\n";
 
-echo 'Время выполнения скрипта: '.(microtime(true) - $start).' сек.';
-echo "\n";
+// echo 'Время выполнения скрипта: '.(microtime(true) - $start).' сек.';
+// echo "\n";
 
-echo 'Пиковое использование памяти PHP: '. formatBytes(memory_get_peak_usage());
-echo "\n";
+// echo 'Пиковое использование памяти PHP: '. formatBytes(memory_get_peak_usage());
+// echo "\n";
