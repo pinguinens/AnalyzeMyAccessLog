@@ -29,9 +29,13 @@ class CCounterEx
         }
 
         if (key_exists('views', $this->stats)) {
+
             $this->stats['views'] += $view;
+
         } else {
+
             $this->stats += ['views' => $view];
+
         }
         
         return $this->stats['views'];
@@ -40,23 +44,18 @@ class CCounterEx
     // Подсчитывает уникальные URL
     private function countUrls($string)
     {
-        preg_match("/[[:upper:]]\s(.*)\sH/", $string, $bufferCur);
-
-        if (isset($bufferCur[1]) and !key_exists('urls', $this->stats)) {
-            $this->stats += ['urls' => array($bufferCur[1])];
-            return 1;
-        } elseif (!isset($bufferCur[1]) and !key_exists('urls', $this->stats)) {
-            preg_match("/\"(.*)\"\s\d/", $iteration, $bufferCur);
-            
-            if (($string !== "") and isset($bufferCur[1])) {
-                $this->stats += ['urls' => array($bufferCur[1])];
-                return 1;
-            }
+        if (!key_exists('urls', $this->stats)) {
+            $this->stats += ['urls' => array()];
         }
+
+        preg_match("/[[:upper:]]\s(.*)\sH/", $string, $bufferCur);
             
         if (isset($bufferCur[1]) and (!in_array($bufferCur[1], $this->stats['urls']))) {
+
             $this->stats['urls'][] = $bufferCur[1];
+
         } elseif (!isset($bufferCur[1])) {
+
             preg_match("/\"(.*)\"\s\d/", $string, $bufferCur);
             
             if (($string !== "") and isset($bufferCur[1])) {
@@ -70,17 +69,18 @@ class CCounterEx
     // Подсчитывает обьем траффика
     private function countTraffic($string)
     {
+        if (!key_exists('traffic', $this->stats)) {
+
+            $this->stats += ['traffic' => 0];
+
+        }
+
         preg_match("/\s(\d*)\s(\d*)\s/", $string, $bufferCur);
 
-        if (isset($bufferCur[2]) and !key_exists('traffic', $this->stats)) {
-            if (isset($bufferCur[1]) and ($bufferCur[1] == 200)) {
-                $this->stats += ['traffic' => $bufferCur[2]];
-                return $this->stats['traffic'];
-            }
-        } else {
-            if (isset($bufferCur[1]) and ($bufferCur[1] == 200)) {
-                $this->stats['traffic'] += $bufferCur[2];
-            }
+        if (isset($bufferCur[1]) and ($bufferCur[1] == 200)) {
+
+            $this->stats['traffic'] += $bufferCur[2];
+
         }
 
         return $this->stats['traffic'];
@@ -99,9 +99,13 @@ class CCounterEx
             preg_match("/".$bots."[a-zA-Z]*\d*/i", $string, $bufferCur);
 
             if (array_key_exists($provider, $this->stats['crawlers'])) {
+
                 $this->stats['crawlers'][$provider] += count($bufferCur);
+
             } else {
+
                 $this->stats['crawlers'] += [$provider => count($bufferCur)];
+
             }
         }
 
@@ -118,12 +122,17 @@ class CCounterEx
         preg_match("/\"\s(\d*)\s/", $string, $bufferCur);
 
         if (($string !== "") and isset($bufferCur[1])) {
+
             $code = $bufferCur[1];
             
             if (array_key_exists($code, $this->stats['statusCodes'])) {
+
                 $this->stats['statusCodes'][$code]++;
+
             } else {
+
                 $this->stats['statusCodes'] += [$code => 1];
+
             }
         }
 

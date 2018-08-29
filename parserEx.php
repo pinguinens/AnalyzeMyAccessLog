@@ -35,6 +35,9 @@ echo $statsJson;
 echo "\n";
 
 // Техническая информация по работе скрипта
+echo 'Файл: '. $argv[1];
+echo "\n";
+
 echo 'Время выполнения скрипта: '.(microtime(true) - $start).' сек.';
 echo "\n";
 
