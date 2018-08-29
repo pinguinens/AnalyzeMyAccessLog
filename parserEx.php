@@ -15,28 +15,19 @@ if (!file_exists($filePath)) {
     die("Указанный файл не существует\n");
 }
 
-$stat = new CCounterEx($filePath);
-// $stats['views'] = $stat->countViews();
-// $stats['urls'] = $stat->countUrls();
-// $stats['traffic'] = $stat->countTraffic();
-// $stats['crawlers'] = $stat->getCrawlers(
-//     array(
-//         'Google' => array('google'),
-//         'Yandex' => array('yandex', 'YandexBot'),
-//         'Bing' => array('bing', 'bingbot'),
-//         'Baidu' => array('baidu', 'Baiduspider')
-//         )
-// );
-// $stats['statusCodes'] = $stat->statusCodes();
-$stats = $stat->getCounters(
-    array(
-        'Google' => array('google'),
-        'Yandex' => array('yandex', 'YandexBot'),
-        'Bing' => array('bing', 'bingbot'),
-        'Baidu' => array('baidu', 'Baiduspider')
-        )
+$stat = new CCounterEx($filePath, array(
+    'Google' => array('google'),
+    'Yandex' => array('yandex', 'YandexBot'),
+    'Bing' => array('bing', 'bingbot'),
+    'Baidu' => array('baidu', 'Baiduspider')
+    )
 );
-// }
+$stat->countAll();
+$stats['views'] = $stat->getViews();
+$stats['urls'] = $stat->getUrls();
+$stats['traffic'] = $stat->getTraffic();
+$stats['crawlers'] = $stat->getCrawlersStats();
+$stats['statusCodes'] = $stat->getStatusCodesStats();
 
 // Вывод результата работы
 $statsJson = json_encode($stats);
@@ -47,5 +38,5 @@ echo "\n";
 echo 'Время выполнения скрипта: '.(microtime(true) - $start).' сек.';
 echo "\n";
 
-echo 'Пиковое потребление памяти PHP: '. formatBytes(memory_get_peak_usage());
+echo 'Пиковое использование памяти PHP: '. formatBytes(memory_get_peak_usage());
 echo "\n";

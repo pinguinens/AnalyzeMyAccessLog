@@ -4,7 +4,6 @@ $start = microtime(true); // Время начала выполнения скр
 include 'metrics/misc.php';  // метрики
 include 'classes/counter.php';  // Класс счётчиков
 
-// for($i=0; $i<2; $i++) {
 // Основное тело парсера
 if (!isset($argv[1])) {
     die("Не указан файл лога\n");
@@ -28,7 +27,6 @@ $stats['crawlers'] = $stat->getCrawlers(
         )
 );
 $stats['statusCodes'] = $stat->statusCodes();
-// }
 
 // Вывод результата работы
 $statsJson = json_encode($stats);
