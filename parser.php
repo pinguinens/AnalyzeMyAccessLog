@@ -14,14 +14,11 @@ if (!file_exists($filePath)) {
     die("Указанный файл не существует\n");
 }
 
+// Получение списка поисковых роботов
+$crawlerList = json_decode(file_get_contents('robots_list.txt'), true);
+
 // Основное тело парсера
-$stat = new CCounter($filePath, array(
-    'Google' => array('google'),
-    'Yandex' => array('yandex', 'YandexBot'),
-    'Bing' => array('bing', 'bingbot'),
-    'Baidu' => array('baidu', 'Baiduspider')
-    )
-);
+$stat = new CCounter($filePath, $crawlerList);
 $stat->countAll();
 $stats['views'] = $stat->getViews();
 $stats['urls'] = $stat->getUrls();

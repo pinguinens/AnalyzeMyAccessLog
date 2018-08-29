@@ -1,0 +1,1 @@
+{"Google":["google"],"Yandex":["yandex","YandexBot"],"Bing":["bing","bingbot"],"Baidu":["baidu","Baiduspider"]}
