@@ -1,7 +1,7 @@
 <?php
 
 // Класс счётчиков
-class CCounterEx
+class CCounter
 {
     private $filePath;
     private $crawlerList;

@@ -2,7 +2,7 @@
 $start = microtime(true); // Время начала выполнения скрипта
 
 include 'metrics/memory.php';  // метрики
-include 'classes/counterEx.php';  // Класс счётчиков
+include 'classes/counter.php';  // Класс счётчиков
 
 // Проверка аргументов команды
 if (!isset($argv[1])) {
@@ -15,7 +15,7 @@ if (!file_exists($filePath)) {
 }
 
 // Основное тело парсера
-$stat = new CCounterEx($filePath, array(
+$stat = new CCounter($filePath, array(
     'Google' => array('google'),
     'Yandex' => array('yandex', 'YandexBot'),
     'Bing' => array('bing', 'bingbot'),
