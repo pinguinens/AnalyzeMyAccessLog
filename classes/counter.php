@@ -84,7 +84,11 @@ class CCounter
         return $buffer;
     }
 
-    // Определяет поисковых ботов
+    /**
+     * Находит посещения поисковых роботов и считает посещения
+     * @param array $crawlersList массив поисковик => array('роботы_поисковика')
+     * @return array поисковик => количество посещений
+     */
     public function getCrawlers($crawlersList)
     {
         $input = $this->readFile();
