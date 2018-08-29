@@ -1,9 +1,11 @@
 <?php
 
 // Класс счётчиков
-class CCounter
+class CCounterEx
 {
     private $filePath;
+    private $crawlerList;
+    private $stats = array();
 
     // Чтение файла
     private function readFile()
@@ -17,121 +19,176 @@ class CCounter
         fclose($handle);
     }
 
-    public function __construct($file)
-    {
-        $this->filePath = $file;
-    }
-
     // Подсчитывает хиты
-    public function countViews()
+    private function countViews($string)
     {
-        $input = $this->readFile();
-        $views = 0;
-        
-        foreach ($input as $iteration) {
-            $views++;
+        if (isset($string) and ($string !== "")) {
+            $view = 1;
+        } else {
+            $view = 0;
+        }
+
+        if (key_exists('views', $this->stats)) {
+
+            $this->stats['views'] += $view;
+
+        } else {
+
+            $this->stats += ['views' => $view];
+
         }
         
-        return $views;
+        return $this->stats['views'];
     }
 
     // Подсчитывает уникальные URL
-    public function countUrls()
+    private function countUrls($string)
     {
-        $input = $this->readFile();
+        if (!key_exists('urls', $this->stats)) {
+            $this->stats += ['urls' => array()];
+        }
 
-        $urls = 0;
-        $buffer = array();
-        
-        foreach ($input as $iteration) {
-            $bufferCur = array();
-
-            preg_match("/[[:upper:]]\s(.*)\sH/", $iteration, $bufferCur);
+        preg_match("/[[:upper:]]\s(.*)\sH/", $string, $bufferCur);
             
-            if (isset($bufferCur[1]) and (!in_array($bufferCur[1], $buffer))) {
-                $buffer[] = $bufferCur[1];
-                $urls++;
-            } elseif (!isset($bufferCur[1])) {
-                preg_match("/\"(.*)\"\s\d/", $iteration, $bufferCur);
-                
-                if ($iteration !== "") {
-                    $buffer[] = $bufferCur[1];
-                    $urls++;
-                }
-            } else {
-                $buffer[] = $bufferCur[1];
+        if (isset($bufferCur[1]) and (!in_array($bufferCur[1], $this->stats['urls']))) {
+
+            $this->stats['urls'][] = $bufferCur[1];
+
+        } elseif (!isset($bufferCur[1])) {
+
+            preg_match("/\"(.*)\"\s\d/", $string, $bufferCur);
+            
+            if (($string !== "") and isset($bufferCur[1])) {
+                $this->stats['urls'][] = $bufferCur[1];
             }
         }
-        
-        return $urls;
+
+        return count($this->stats['urls']);
     }
 
     // Подсчитывает обьем траффика
-    public function countTraffic()
+    private function countTraffic($string)
     {
-        $input = $this->readFile();
+        if (!key_exists('traffic', $this->stats)) {
 
-        $buffer = 0;
+            $this->stats += ['traffic' => 0];
 
-        foreach ($input as $iteration) {
-            preg_match("/\s(\d*)\s(\d*)\s/", $iteration, $bufferCur);
-
-            if (isset($bufferCur[1]) and ($bufferCur[1] == 200)) {
-                $buffer += $bufferCur[2];
-            }
         }
 
-        return $buffer;
+        preg_match("/\s(\d*)\s(\d*)\s/", $string, $bufferCur);
+
+        if (isset($bufferCur[1]) and ($bufferCur[1] == 200)) {
+
+            $this->stats['traffic'] += $bufferCur[2];
+
+        }
+
+        return $this->stats['traffic'];
     }
 
-    /**
-     * Находит посещения поисковых роботов и считает посещения
-     * @param array $crawlersList массив поисковик => array('роботы_поисковика')
-     * @return array поисковик => количество посещений
-     */
-    public function getCrawlers($crawlersList)
+    // Определяет поисковых ботов
+    private function crawlersStats($string)
     {
-        $input = $this->readFile();
+        if (!key_exists('crawlers', $this->stats)) {
+            $this->stats += ['crawlers' => array()];
+        }
 
-        $buffer = array();
+        foreach ($this->crawlerList as $provider => $bot) {
+            $bots = implode('|', $bot);
 
-        foreach ($input as $iteration) {
-            foreach ($crawlersList as $provider => $bot) {
-                $bots = implode('|', $bot);
+            preg_match("/".$bots."[a-zA-Z]*\d*/i", $string, $bufferCur);
 
-                preg_match("/".$bots."[a-zA-Z]*\d*/i", $iteration, $bufferCur);
+            if (array_key_exists($provider, $this->stats['crawlers'])) {
 
-                if (array_key_exists($provider, $buffer)) {
-                    $buffer[$provider] += count($bufferCur);
-                } else {
-                    $buffer += [$provider => count($bufferCur)];
-                }
+                $this->stats['crawlers'][$provider] += count($bufferCur);
+
+            } else {
+
+                $this->stats['crawlers'] += [$provider => count($bufferCur)];
+
             }
         }
 
-        return $buffer;
+        return $this->stats['crawlers'];
     }
 
     // Определяет коды ответов
-    public function statusCodes()
+    private function statusCodesStats($string)
     {
-        $input = $this->readFile();
+        if (!key_exists('statusCodes', $this->stats)) {
+            $this->stats += ['statusCodes' => array()];
+        }
         
-        $bufferArr = array();
-        
-        foreach ($input as $iteration) {
-            preg_match("/\"\s(\d*)\s/", $iteration, $bufferCur);
+        preg_match("/\"\s(\d*)\s/", $string, $bufferCur);
 
-            if (isset($bufferCur[1])) {
-                $code = $bufferCur[1];
-            }
-            if (array_key_exists($code, $bufferArr)) {
-                $bufferArr[$code]++;
+        if (($string !== "") and isset($bufferCur[1])) {
+
+            $code = $bufferCur[1];
+            
+            if (array_key_exists($code, $this->stats['statusCodes'])) {
+
+                $this->stats['statusCodes'][$code]++;
+
             } else {
-                $bufferArr += [$code => 1];
+
+                $this->stats['statusCodes'] += [$code => 1];
+
             }
         }
 
-        return $bufferArr;
+        return $this->stats['statusCodes'];
+    }
+
+    public function __construct($file, $crawlerList)
+    {
+        $this->filePath = $file;
+        $this->crawlerList = $crawlerList;
+    }
+
+    // Подсчитывает все показатели
+    public function countAll() {
+        $input = $this->readFile();
+
+        foreach ($input as $string) {
+            // Хиты
+            $this -> countViews($string);
+
+            // Уникальные URL
+            $this->countUrls($string);
+
+            // Обьем траффика
+            $this->countTraffic($string);
+
+            // Определяет поисковых ботов
+            $this->crawlersStats($string);
+            
+            // Определяет коды ответов
+            $this->statusCodesStats($string);
+        }
+    }
+
+    // Выводит количство хитов
+    public function getViews() {
+        return $this->stats['views'];
+    }
+    
+    // Выводит количство уникальных URL
+    public function getUrls() {
+        return count($this->stats['urls']);
+    }
+    
+    // Выводит количство уникальных URL
+    public function getTraffic() {
+        return $this->stats['traffic'];
+    }
+    
+    // Выводит статистику поисковых ботов
+    public function getCrawlersStats() {
+        return $this->stats['crawlers'];
+    }
+    
+    // Выводит статистику кодов ответа
+    public function getStatusCodesStats() {
+        return $this->stats['statusCodes'];
     }
 }
