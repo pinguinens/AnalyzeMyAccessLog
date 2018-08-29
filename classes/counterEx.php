@@ -48,7 +48,7 @@ class CCounterEx
         } elseif (!isset($bufferCur[1]) and !key_exists('urls', $this->stats)) {
             preg_match("/\"(.*)\"\s\d/", $iteration, $bufferCur);
             
-            if (($iteration !== "") and isset($bufferCur[1])) {
+            if (($string !== "") and isset($bufferCur[1])) {
                 $this->stats += ['urls' => array($bufferCur[1])];
                 return 1;
             }
@@ -59,7 +59,7 @@ class CCounterEx
         } elseif (!isset($bufferCur[1])) {
             preg_match("/\"(.*)\"\s\d/", $string, $bufferCur);
             
-            if ($iteration !== "") {
+            if (($string !== "") and isset($bufferCur[1])) {
                 $this->stats['urls'][] = $bufferCur[1];
             }
         }
@@ -117,13 +117,14 @@ class CCounterEx
         
         preg_match("/\"\s(\d*)\s/", $string, $bufferCur);
 
-        if (isset($bufferCur[1])) {
+        if (($string !== "") and isset($bufferCur[1])) {
             $code = $bufferCur[1];
-        }
-        if (array_key_exists($code, $this->stats['statusCodes'])) {
-            $this->stats['statusCodes'][$code]++;
-        } else {
-            $this->stats['statusCodes'] += [$code => 1];
+            
+            if (array_key_exists($code, $this->stats['statusCodes'])) {
+                $this->stats['statusCodes'][$code]++;
+            } else {
+                $this->stats['statusCodes'] += [$code => 1];
+            }
         }
 
         return $this->stats['statusCodes'];

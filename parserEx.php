@@ -1,11 +1,10 @@
 <?php
 $start = microtime(true); // Время начала выполнения скрипта
 
-include 'metrics/misc.php';  // метрики
+include 'metrics/memory.php';  // метрики
 include 'classes/counterEx.php';  // Класс счётчиков
 
-// for($i=0; $i<2; $i++) {
-// Основное тело парсера
+// Проверка аргументов команды
 if (!isset($argv[1])) {
     die("Не указан файл лога\n");
 } else {
@@ -15,6 +14,7 @@ if (!file_exists($filePath)) {
     die("Указанный файл не существует\n");
 }
 
+// Основное тело парсера
 $stat = new CCounterEx($filePath, array(
     'Google' => array('google'),
     'Yandex' => array('yandex', 'YandexBot'),
