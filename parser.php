@@ -28,8 +28,7 @@ $stats['statusCodes'] = $stat->getStatusCodesStats();
 
 // Вывод результата работы
 $statsJson = json_encode($stats);
-echo $statsJson;
-echo "\n";
+echo "$statsJson\n";
 
 // Техническая информация по работе скрипта
 echo 'Файл: '. $argv[1];
